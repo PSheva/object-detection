@@ -1,0 +1,56 @@
+# Python-related ignores
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+*.env
+*.venv
+
+# Byte-compiled files
+*.pyc
+*.pyo
+
+# C extensions
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+*.out
+*.err
+
+# Ignore data files
+*.sqlite3
+*.db
+*.csv
+*.tsv
+*.json
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Videos directory (if dynamically generated or large test files)
+videos/
+
+# Docker files
+*.dockerignore
+docker-compose.override.yml
+
+# Results, models, and other outputs
+results/
+models/
+weights/
+
+# Ignore the 'yolov8-for-miltech.ipynb' if unnecessary
+yolov8-for-miltech.ipynb
+
+# IDE and editor-specific files
+.vscode/
+.idea/
