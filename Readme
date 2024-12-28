@@ -6,3 +6,6 @@
 - cd ..
 ### Run this command in object-detection directory (will take a few minutes to complete)
 - docker-compose up --build
+
+
+But model contains several GB so i havent uploaded it here
