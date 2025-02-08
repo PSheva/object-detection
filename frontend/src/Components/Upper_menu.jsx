@@ -8,14 +8,14 @@ const upper_menu = ({setSidebar}) => {
     <div>
       <nav className='flex-div-upper flex-div'>
         <div className='left-nav flex-div'>
-          <img className='upper-menu-icon' onClick={()=>setSidebar(prev=>prev===false?true:false)} src="" alt="" />
+          <img className='upper-menu-icon' onClick={()=>setSidebar(prev=>prev===false?true:false)} src="src/assets/vision.png" alt="" />
           
-          <img className='logo' src="logo" alt="" />
+          {/* <img className='logo' src="logo" alt="" /> */}
         </div>
 
         <div className='center-nav flex-div'></div>
           <div className='search-box flex-div'>
-            <input type="text" name="" id=""  placeholder='Test-placeholder'/>
+            {/* <input type="text" name="" id=""  placeholder='Test-placeholder'/> */}
             {/* <img src={self_photo} alt="" /> */}
           </div>
           

@@ -1,102 +1,95 @@
-import React, { useState, useRef } from 'react';
-import VideoBox from './VideoBox';
-import '/src/css/PlayManager.css';
+import React, { useState, useRef } from "react";
+import VideoBox from "./VideoBox";
+import "/src/css/PlayManager.css";
 
-const PlayManager = ({ setSidebarContent }) => {
+const PlayManager = ({ setSidebarContent, displayedTags = [], filteredTags = [] }) => {
   const [videos, setVideos] = useState([]);
   const fileInputRef = useRef(null);
+
+  console.log("🔄 Рендер PlayManager");
+  console.log("🛠️ Поточні filteredTags:", filteredTags);
+  console.log("📊 Всього відео:", videos.length);
+
+  const filteredVideos = videos.map(video => {
+    if (!video.recognizedTags || video.recognizedTags.length === 0) {
+      // console.log(🚫 Відео без розпізнаних тегів: ${video.url} → ${filteredTags.length === 0 ? "ЗАЛИШАЄМО" : "ПРИХОВУЄМО"});
+      return { ...video, isVisible: filteredTags.length === 0 };
+    }
+
+    // console.log(📽️ Відео: ${video.url} | 🏷️ Розпізнані теги: ${video.recognizedTags.join(", ")});
+
+    const matches = filteredTags.length === 0 || filteredTags.some(tag => video.recognizedTags.includes(tag));
+    console.log(matches ? "✅ Відео ВИДИМЕ" : "❌ Відео ПРИХОВАНЕ");
+
+    return { ...video, isVisible: matches };
+  });
 
   const handleVideoUpload = (event) => {
     const newVideos = Array.from(event.target.files).map((file) => ({
       file: file,
       url: URL.createObjectURL(file),
       json: null,
-      tags: []
+      recognizedTags: [],
+      isVisible: true,
     }));
     setVideos((prevVideos) => [...prevVideos, ...newVideos]);
     event.target.value = null;
   };
 
-  const handleJsonUpload = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const json = JSON.parse(e.target.result);
-      setSidebarContent(json);
-    };
-    reader.readAsText(file);
+  const updateRecognizedTags = (videoUrl, recognizedTags) => {
+    setVideos(prevVideos =>
+      prevVideos.map(video =>
+        video.url === videoUrl
+          ? { ...video, recognizedTags }
+          : video
+      )
+    );
   };
 
-  const extractTags = (json) => {
-    const tags = new Set();
-    for (const frame of Object.values(json)) {
-      frame.forEach((obj) => {
-        tags.add(obj.label);
-      });
-    }
-    return Array.from(tags);
-  };
+  const playAllVideos = () => document.querySelectorAll("video").forEach(video => video.play());
+  const pauseAllVideos = () => document.querySelectorAll("video").forEach(video => video.pause());
+  const stopAllVideos = () => document.querySelectorAll("video").forEach(video => {
+    video.pause();
+    video.currentTime = 0;
+  });
 
-  const deleteVideo = (index) => {
-    setVideos((prevVideos) => prevVideos.filter((_, i) => i !== index));
-  };
-
-  const deleteAllVideos = () => {
-    setVideos([]);
-  };
-
-  const handleClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const playAllVideos = () => {
-    document.querySelectorAll('video').forEach((video) => video.play());
-  };
-
-  const pauseAllVideos = () => {
-    document.querySelectorAll('video').forEach((video) => video.pause());
-  };
-
-  const stopAllVideos = () => {
-    document.querySelectorAll('video').forEach((video) => {
-      video.pause();
-      video.currentTime = 0;
+  const deleteVideo = (videoUrl) => {
+    console.log("🗑 Видаляємо відео з URL:", videoUrl);
+    setVideos((prevVideos) => {
+      console.log("📋 Відео ДО видалення:", prevVideos.map(v => v.url));
+      const updatedVideos = prevVideos.filter(video => video.url !== videoUrl);
+      console.log("✅ Відео ПІСЛЯ видалення:", updatedVideos.map(v => v.url));
+      return [...updatedVideos]; // СТВОРЮЄМО НОВИЙ МАСИВ, ЩОБ РЕАКТ БАЧИВ ОНОВЛЕННЯ
     });
   };
+  
+
+  const deleteAllVideos = () => setVideos([]);
 
   return (
-    <div className='play-manager'>
-      {/* Загальні кнопки управління */}
-      <div className='general-buttons'>
-        <button onClick={handleClick}>Upload Video</button>
-        <input
-          ref={fileInputRef}
-          type='file'
-          accept='video/*'
-          multiple
-          onChange={handleVideoUpload}
-          style={{ display: 'none' }}
-        />
+    <div className="player-manager">
+      <div className="general-buttons">
+        <button onClick={() => fileInputRef.current.click()}>Upload Video</button>
+        <input ref={fileInputRef} type="file" accept="video/*" multiple onChange={handleVideoUpload} style={{ display: "none" }} />
         <button onClick={playAllVideos}>Play All</button>
         <button onClick={pauseAllVideos}>Pause All</button>
         <button onClick={stopAllVideos}>Stop All</button>
-        <button onClick={deleteAllVideos}>Delete All</button>
+        <button onClick={deleteAllVideos} style={{ backgroundColor: "red" }}>Delete All</button>
       </div>
 
-      {/* Контейнер для відео */}
-      <div className='video-container'>
-        {videos.map((video, index) => (
-          <div key={index} className='video-box-wrapper'>
+      <div className="video-container">
+        {filteredVideos.map(video => (
+          <div key={video.url} className="video-box-wrapper" style={{ display: video.isVisible ? "block" : "none" }}>
             <VideoBox
               video={video}
               setSidebarContent={setSidebarContent}
-              deleteVideo={() => deleteVideo(index)}
+              displayedTags={displayedTags}
+              updateRecognizedTags={(recognizedTags) => updateRecognizedTags(video.url, recognizedTags)}
+              deleteVideo={() => deleteVideo(video.url)}
             />
           </div>
         ))}
       </div>
-
-      
     </div>
   );
 };

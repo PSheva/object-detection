@@ -1,83 +1,94 @@
 import React, { useRef, useState, useEffect } from "react";
 import "/src/css/VideoBox.css";
 
-const VideoBox = ({ video, setSidebarContent, deleteVideo, filterTags }) => {
+const VideoBox = ({ video, setSidebarContent, deleteVideo, displayedTags = [], updateRecognizedTags }) => {
   const videoRef = useRef(null);
+  const [responseJson, setResponseJson] = useState(null);
   const [classTimelines, setClassTimelines] = useState({});
   const [currentFrameObjects, setCurrentFrameObjects] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [responseJson, setResponseJson] = useState(null);
 
   useEffect(() => {
     if (responseJson && Array.isArray(responseJson.video_analysis)) {
       generateTimelines(responseJson.video_analysis);
     }
-  }, [responseJson, filterTags]);
+  }, [responseJson]);
 
   const generateTimelines = (videoAnalysis) => {
     const timelines = {};
     videoAnalysis.forEach((frame) => {
       frame.objects.forEach((obj) => {
         const objectClass = obj["object-class"];
-        if (!filterTags || filterTags.includes(objectClass)) {
-          if (!timelines[objectClass]) {
-            timelines[objectClass] = [];
-          }
-          timelines[objectClass].push(frame.time);
+        if (!timelines[objectClass]) {
+          timelines[objectClass] = [];
         }
+        timelines[objectClass].push(frame.time);
       });
     });
     setClassTimelines(timelines);
   };
 
-  const playVideo = () => {
-    if (videoRef.current) {
-      videoRef.current.play();
-    }
-  };
-
-  const pauseVideo = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-    }
-  };
-
-  const stopVideo = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  };
-
-  const handleTimelineClick = (time) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = time;
-    }
-  };
-
   const updateBoundingBoxes = () => {
-    if (responseJson) {
-      const currentTime = videoRef.current?.currentTime || 0;
-      const frame = responseJson.video_analysis.find(
-        (frame) => Math.abs(frame.time - currentTime) < 0.1
-      );
-      setCurrentFrameObjects(frame?.objects || []);
-    }
+    if (!responseJson) return;
+    const currentTime = videoRef.current?.currentTime || 0;
+    const frame = responseJson.video_analysis.find(
+      (frame) => Math.abs(frame.time - currentTime) < 0.1
+    );
+    if (!frame) return;
+    setCurrentFrameObjects(
+      frame.objects.filter((obj) => displayedTags.includes(obj["object-class"]))
+    );
   };
 
   useEffect(() => {
     const videoElement = videoRef.current;
-
     if (videoElement) {
       videoElement.addEventListener("timeupdate", updateBoundingBoxes);
     }
-
     return () => {
       if (videoElement) {
         videoElement.removeEventListener("timeupdate", updateBoundingBoxes);
       }
     };
-  }, [responseJson]);
+  }, [responseJson, displayedTags]);
+
+  const handleJsonUpload = (event) => {
+    if (!event.target.files || event.target.files.length === 0) {
+      alert("No file selected.");
+      return;
+    }
+    const file = event.target.files[0];
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target.result);
+        if (!json || !json.video_analysis || !Array.isArray(json.video_analysis)) {
+          throw new Error("Invalid JSON format. Missing 'video_analysis' key.");
+        }
+
+        console.log("✅ JSON loaded successfully:", json);
+        setResponseJson(json);
+        setSidebarContent(json);
+        generateTimelines(json.video_analysis);
+
+        const recognizedTags = new Set();
+        json.video_analysis.forEach(frame => {
+          frame.objects.forEach(obj => recognizedTags.add(obj["object-class"]));
+        });
+
+        // ✅ Передаємо recognizedTags у PlayManager
+        updateRecognizedTags(Array.from(recognizedTags));
+
+        alert("JSON report loaded successfully.");
+      } catch (error) {
+        console.error("❌ JSON Parse Error:", error.message);
+        alert("Invalid JSON format: " + error.message);
+      }
+    };
+
+    reader.readAsText(file);
+  };
 
   const handleSendVideo = async () => {
     if (!video.file) {
@@ -102,6 +113,18 @@ const VideoBox = ({ video, setSidebarContent, deleteVideo, filterTags }) => {
 
       const json = await response.json();
       setResponseJson(json);
+      setSidebarContent(json);
+      generateTimelines(json.video_analysis);
+
+      const recognizedTags = new Set();
+        json.video_analysis.forEach(frame => {
+          frame.objects.forEach(obj => recognizedTags.add(obj["object-class"]));
+        });
+
+        // ✅ Передаємо recognizedTags у PlayManager
+        updateRecognizedTags(Array.from(recognizedTags));
+
+
       alert("Video processed successfully.");
     } catch (error) {
       console.error("Error uploading video:", error);
@@ -111,28 +134,7 @@ const VideoBox = ({ video, setSidebarContent, deleteVideo, filterTags }) => {
     }
   };
 
-  const handleJsonUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const json = JSON.parse(e.target.result);
-          if (Array.isArray(json)) {
-            setResponseJson({ video_analysis: json });
-            generateTimelines(json);
-            alert("JSON report loaded successfully.");
-          } else {
-            alert("Invalid JSON format. Please provide a valid video analysis JSON.");
-          }
-        } catch (error) {
-          alert("Error parsing JSON: " + error.message);
-        }
-      };
-      reader.readAsText(file);
-    }
-  };
-
+  // ✅ Завантаження JSON у Sidebar
   const handleShowJson = () => {
     if (responseJson) {
       setSidebarContent(responseJson);
@@ -141,12 +143,27 @@ const VideoBox = ({ video, setSidebarContent, deleteVideo, filterTags }) => {
     }
   };
 
+  // ✅ Завантаження JSON-звіту
+  const handleDownloadJson = () => {
+    if (!responseJson) {
+      alert("No JSON data available to download.");
+      return;
+    }
+
+    const jsonBlob = new Blob([JSON.stringify(responseJson, null, 2)], {
+      type: "application/json",
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(jsonBlob);
+    link.download = "video-analysis-result.json";
+    link.click();
+  };
+
   return (
     <div className="video-box-container">
       <div className="video-content">
         <video ref={videoRef} controls>
           <source src={video.url || ""} type="video/mp4" />
-          Your browser does not support the video tag.
         </video>
         <div className="overlay">
           {currentFrameObjects.map((obj, index) => (
@@ -165,16 +182,32 @@ const VideoBox = ({ video, setSidebarContent, deleteVideo, filterTags }) => {
           ))}
         </div>
       </div>
+
       <div className="video-controls">
-        <button onClick={playVideo}>Play</button>
-        <button onClick={pauseVideo}>Pause</button>
-        <button onClick={stopVideo}>Stop</button>
-        <button onClick={deleteVideo}>Delete</button>
+        <button onClick={() => videoRef.current?.play()}>Play</button>
+        <button onClick={() => videoRef.current?.pause()}>Pause</button>
+        <button onClick={() => { videoRef.current.pause(); videoRef.current.currentTime = 0; }}>Stop</button>
+        <button onClick={() => {
+            console.log("🛑 Клік на Delete у відео:", video.url);
+            if (typeof deleteVideo === "function") {
+              deleteVideo(video.url);
+            } else {
+              console.error("❌ deleteVideo не є функцією!");
+            }
+          }} style={{ backgroundColor: "red" }}>
+            Delete
+          </button>
+
+
+
         <button onClick={handleSendVideo} disabled={uploading}>
           {uploading ? "Sending..." : "Send"}
         </button>
-        <button onClick={handleShowJson}>Show JSON</button>
+        <button onClick={handleShowJson} style={{ backgroundColor: responseJson ? "green" : "" }}>
+          Show JSON
+        </button>
       </div>
+
       {responseJson && Object.keys(classTimelines).length > 0 && (
         <div className="timelines">
           {Object.entries(classTimelines).map(([objectClass, times], index) => (
@@ -188,7 +221,7 @@ const VideoBox = ({ video, setSidebarContent, deleteVideo, filterTags }) => {
                     style={{
                       left: `${(time / (videoRef.current?.duration || 1)) * 100}%`,
                     }}
-                    onClick={() => handleTimelineClick(time)}
+                    onClick={() => videoRef.current && (videoRef.current.currentTime = time)}
                   ></div>
                 ))}
               </div>
@@ -196,28 +229,16 @@ const VideoBox = ({ video, setSidebarContent, deleteVideo, filterTags }) => {
           ))}
         </div>
       )}
+
       <div className="file-upload">
         <label>
-          Upload Video or JSON Report:
-          <input
-            type="file"
-            accept=".mp4,.json"
-            onChange={(event) => {
-              const file = event.target.files[0];
-              if (file) {
-                if (file.type === "application/json" || file.name.endsWith(".json")) {
-                  handleJsonUpload(event);
-                } else if (file.type === "video/mp4" || file.name.endsWith(".mp4")) {
-                  video.file = file;
-                  video.url = URL.createObjectURL(file);
-                } else {
-                  alert("Unsupported file type. Please upload a .mp4 or .json file.");
-                }
-              }
-            }}
-          />
+          Upload JSON Report:
+          <input type="file" accept=".json" onChange={handleJsonUpload} />
         </label>
       </div>
+      <button onClick={handleDownloadJson} disabled={!responseJson} style={{ backgroundColor: responseJson ? "green" : "" }}>
+        Download JSON
+      </button>
     </div>
   );
 };

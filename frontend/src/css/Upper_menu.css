@@ -10,7 +10,7 @@ nav{
 }
 
 .left-nav .upper-menu-icon{
-    width: 22px;
+    /* width: 22px; */
     margin-right: 25px;        
 }
 
@@ -25,4 +25,11 @@ nav{
     margin: 15px;
     padding: 8px 12px;
     border-radius: 25px;
+}
+
+.flex-div-upper{
+    background-color: #8fb192;
+    width: 100%;
+    position: fixed;
+    height: 4%;
 }
