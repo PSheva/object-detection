@@ -102,7 +102,8 @@ const VideoBox = ({ video, setSidebarContent, deleteVideo, displayedTags = [], u
     formData.append("file", video.file);
 
     try {
-      const response = await fetch("http://localhost:8000/upload-video/", {
+      // const response = await fetch("http://localhost:8000/upload-video/", {
+      const response = await fetch("http://198.71.51.17/api/upload-video/", {
         method: "POST",
         body: formData,
       });
