@@ -36,8 +36,8 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - UVICORN_CMD=uvicorn server:app --host 0.0.0.0 --port 8000
-    command: ${UVICORN_CMD}
+      - VITE_BACKEND_URL=http://198.71.51.17/api 
+    command: ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
 
   frontend:
     build:
