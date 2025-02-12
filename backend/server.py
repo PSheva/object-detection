@@ -43,6 +43,10 @@ MODEL_PATH = "best.pt"
 MIN_CONFIDENCE = 0.5
 model = YOLO(MODEL_PATH).to(DEVICE)
 
+@app.get("/")
+def root():
+    return {"message": "Backend is working!"}
+
 @app.post("/upload-video/")
 async def upload_video(file: UploadFile = File(...)):
     """
