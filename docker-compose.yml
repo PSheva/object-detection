@@ -50,4 +50,4 @@ services:
       - /app/node_modules
     environment:
       - VITE_BACKEND_URL=http://198.71.51.17/api
-    command: npm run build
+    command: ["serve", "-s", "dist", "-l", "5173"]
