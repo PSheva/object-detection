@@ -6,4 +6,5 @@ COPY . .
 EXPOSE 5173
 
 # Запуск Vite
-CMD ["npm", "run", "dev"]
+# CMD ["npm", "run", "dev"] change to launch as dev
+CMD ["npm", "run", "build"]
