@@ -17,7 +17,7 @@ COPY package*.json ./
 RUN npm ci --omit=optional
 
 COPY . .
-EXPOSE 5173
+EXPOSE 4242
 
 # Запуск серверу
-CMD ["serve", "-s", "dist", "-l", "5173"]
+CMD ["serve", "-s", "dist", "-l", "4242"]
