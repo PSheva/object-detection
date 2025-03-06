@@ -17,13 +17,6 @@ COPY package*.json ./
 RUN npm ci --omit=optional
 
 COPY . .
-
-# Збірка фронтенду
-RUN npm run build
-
-# Встановлення HTTP-серверу для роздачі фронтенду
-RUN npm install -g serve
-
 EXPOSE 5173
 
 # Запуск серверу
