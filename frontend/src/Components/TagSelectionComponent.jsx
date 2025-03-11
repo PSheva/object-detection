@@ -15,11 +15,7 @@ const TagSelectionComponent = ({ tags, setDisplayedTags }) => {
     <div className="tag-selection-component">
       {tags.map((tag) => (
         <div key={tag} className="tag-option">
-          <input
-            type="checkbox"
-            value={tag}
-            onChange={handleTagChange}
-          />
+          <input type="checkbox" value={tag} onChange={handleTagChange} />
           <label>{tag}</label>
         </div>
       ))}

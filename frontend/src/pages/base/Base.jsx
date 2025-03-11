@@ -4,7 +4,7 @@ import Sidebar from '../../Components/Sidebar';
 import PlayManager from '../../Components/PlayManager';
 
 const Base = ({
-  Upper_menu, 
+  Upper_menu,
   sidebar,
   sidebarContent,
   setSidebarContent,
@@ -12,7 +12,7 @@ const Base = ({
   displayedTags,
   setDisplayedTags,
   filteredTags,
-  setFilteredTags
+  setFilteredTags,
 }) => {
   const handleJsonUpload = (event) => {
     const file = event.target.files[0];
@@ -29,22 +29,21 @@ const Base = ({
   return (
     <>
       {Upper_menu && <Upper_menu setSidebar={setSidebarContent} />}
-
       <Sidebar
         sidebar={sidebar}
         sidebarContent={sidebarContent}
         handleJsonUpload={handleJsonUpload}
         displayedTags={displayedTags} // Передаємо у Sidebar.jsx
-        setDisplayedTags={setDisplayedTags} 
+        setDisplayedTags={setDisplayedTags}
         filteredTags={filteredTags}
         setFilteredTags={setFilteredTags}
       />
-      
+
       <div className={`container ${sidebar ? 'opened-sidebar' : ''}`}>
-        <PlayManager 
+        <PlayManager
           displayedTags={displayedTags} // Передаємо у PlayManager.jsx
           filteredTags={filteredTags} // Передаємо у PlayManager.jsx (майбутній функціонал)
-          setSidebarContent={setSidebarContent} 
+          setSidebarContent={setSidebarContent}
         />
       </div>
     </>
