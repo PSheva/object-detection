@@ -54,7 +54,7 @@ services:
       - .env
 
   nginx:
-    image: nginx:latest
+    image: object-detection_frontend:latest
     restart: always
     ports:
       - "80:80"
