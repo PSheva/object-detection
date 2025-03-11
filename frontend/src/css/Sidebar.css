@@ -1,65 +1,65 @@
 .sidebar {
-    background: #8fb192;
-    width: 25%;
-    height: 100vh;
-    position: fixed;
-    padding-left: 2%;
-    padding-top: 5%;
-    overflow-y: auto;
+  background: #8fb192;
+  width: 25%;
+  height: 100vh;
+  position: fixed;
+  padding-left: 2%;
+  padding-top: 5%;
+  overflow-y: auto;
 }
 
 .json-report {
-    max-height: 40vh;
-    overflow-y: auto;
-    overflow-x: auto;
+  max-height: 40vh;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 /* Оновлюємо, щоб обидва стовпчики були поряд */
 .tags-wrapper {
-    display: flex;
-    flex-direction: row; /* Робимо горизонтальне розміщення */
-    justify-content: space-between; /* Розподіляємо місце */
-    gap: 20px; /* Відстань між стовпчиками */
+  display: flex;
+  flex-direction: row; /* Робимо горизонтальне розміщення */
+  justify-content: space-between; /* Розподіляємо місце */
+  gap: 20px; /* Відстань між стовпчиками */
 }
 
 .hashtags {
-    flex: 1; /* Обидва блоки займають однакову ширину */
-    min-width: 200px; /* Мінімальна ширина для коректного вигляду */
+  flex: 1; /* Обидва блоки займають однакову ширину */
+  min-width: 200px; /* Мінімальна ширина для коректного вигляду */
 }
 
 .tag-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .tag-div {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .hashtags p {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 /* Вузький sidebar при hover */
 .hover-sidebar {
-    width: 5%;
+  width: 5%;
 }
 
 .hover-sidebar .json-report,
 .hover-sidebar .hashtags {
-    display: none;
+  display: none;
 }
 
 .hover-sidebar hr {
-    width: 5%;
+  width: 5%;
 }
 
 @media (max-width: 900px) {
-    .sidebar {
-        display: none;
-    }
+  .sidebar {
+    display: none;
+  }
 }

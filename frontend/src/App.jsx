@@ -1,13 +1,13 @@
-import Upper_menu from './Components/Upper_menu.jsx'
-import { Route, Routes } from "react-router-dom"
-import Base from './pages/base/Base' 
-import { useState } from 'react'
+import Upper_menu from './Components/Upper_menu.jsx';
+import { Route, Routes } from 'react-router-dom';
+import Base from './pages/base/Base';
+import { useState } from 'react';
 
 function App() {
   const [sidebar, setSidebar] = useState(true);
   const [sidebarContent, setSidebarContent] = useState(null);
-  const [tags, setTags] = useState([]); 
-  const [displayedTags, setDisplayedTags] = useState([]);  // Відповідає за bounding boxes
+  const [tags, setTags] = useState([]);
+  const [displayedTags, setDisplayedTags] = useState([]); // Відповідає за bounding boxes
   const [filteredTags, setFilteredTags] = useState([]); // Відповідає за видимість відео
 
   return (
@@ -26,7 +26,7 @@ function App() {
                 setDisplayedTags={setDisplayedTags}
                 displayedTags={displayedTags} // Передаємо в Base
                 filteredTags={filteredTags} // Передаємо в Base
-                setFilteredTags={setFilteredTags} 
+                setFilteredTags={setFilteredTags}
               />
             }
           />
