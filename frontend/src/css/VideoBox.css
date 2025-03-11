@@ -42,6 +42,7 @@ video {
   font-weight: bold;
 }
 
+
 /* Контейнер для заголовка і чекбоксу */
 .timeline-header {
   display: flex;
@@ -102,9 +103,7 @@ video {
   font-size: 16px;
   padding: 6px 12px;
   border-radius: 50%;
-  transition:
-    background-color 0.2s ease-in-out,
-    transform 0.1s ease-in-out;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,6 +120,7 @@ video {
   background-color: #003f80;
   transform: scale(0.95);
 }
+
 
 /* Чекбокси */
 .timeline-checkbox {
@@ -171,17 +171,6 @@ button {
   transition: background-color 0.2s ease-in-out;
 }
 
-.fullScreenButton {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  z-index: 1000;
-}
-
-video::-webkit-media-controls-fullscreen-button {
-  display: none;
-}
-
 button:hover {
   background-color: #0056b3;
 }
@@ -193,13 +182,6 @@ button:hover {
   width: 100%;
   height: 100%;
   pointer-events: none;
-}
-
-:fullscreen .video-container,
-:fullscreen video,
-:fullscreen .overlay {
-  width: 100vw;
-  height: 100vh;
 }
 
 /* Стилі для Bounding Box */
@@ -226,3 +208,4 @@ button:hover {
   pointer-events: none;
   z-index: 1000;
 }
+

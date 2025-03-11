@@ -1,14 +1,20 @@
-body {
-  margin: 0;
+*{
+
 }
 
-img {
+img{
   cursor: pointer;
   height: 45px;
   width: 35px;
 }
 
-.flex-div {
+a{
+
+}
+
+
+.flex-div{
   display: flex;
   align-items: center;
 }
+
